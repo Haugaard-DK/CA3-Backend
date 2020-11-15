@@ -43,5 +43,14 @@ public class JokeResource {
         List<JokeDTO> jokeDTOs = FACADE.getJokes(THREAD_POOL);
         return Response.ok(jokeDTOs).build();
     }
+    
+    @GET
+    @Path("joke")
+    @RolesAllowed("User")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getJoke() throws FetchException{
+        JokeDTO joke = FACADE.getJoke();
+        return Response.ok(joke).build();
+    }
 
 }

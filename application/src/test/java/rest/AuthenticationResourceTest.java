@@ -222,8 +222,8 @@ public class AuthenticationResourceTest {
         Date issuedAt = claims.getIssuedAt();
         Date expiration = claims.getExpiration();
 
-        long issueTime = TimeUnit.MINUTES.convert(issuedAt.getTime(), TimeUnit.NANOSECONDS);
-        long expirationTime = TimeUnit.MINUTES.convert(expiration.getTime(), TimeUnit.NANOSECONDS);
+        long issueTime = TimeUnit.MINUTES.convert(issuedAt.getTime(), TimeUnit.MILLISECONDS);
+        long expirationTime = TimeUnit.MINUTES.convert(expiration.getTime(), TimeUnit.MILLISECONDS);
         long actual = expirationTime - issueTime;
 
         // Assert
@@ -289,6 +289,70 @@ public class AuthenticationResourceTest {
                 .assertThat()
                 .body("code", is(HttpStatus.BAD_REQUEST_400.getStatusCode())).and()
                 .body("message", is("Username already in use."));
+    }
+
+    @Test
+    public void register_Failed_Username_Not_Provided() {
+        given()
+                .contentType(ContentType.JSON)
+                .body(String.format("{userName: \"%s\", "
+                        + "firstName: \"%s\", "
+                        + "lastName: \"%s\" , "
+                        + "password: \"%s\"}",
+                        "", user.getFirstName(), user.getLastName(), password))
+                .when().post("/auth/register")
+                .then()
+                .assertThat()
+                .body("code", is(HttpStatus.BAD_REQUEST_400.getStatusCode())).and()
+                .body("message", is("Not all user credentials was provided."));
+    }
+
+    @Test
+    public void register_Failed_Firstname_Not_Provided() {
+        given()
+                .contentType(ContentType.JSON)
+                .body(String.format("{userName: \"%s\", "
+                        + "firstName: \"%s\", "
+                        + "lastName: \"%s\" , "
+                        + "password: \"%s\"}",
+                        user.getUserName(), "", user.getLastName(), password))
+                .when().post("/auth/register")
+                .then()
+                .assertThat()
+                .body("code", is(HttpStatus.BAD_REQUEST_400.getStatusCode())).and()
+                .body("message", is("Not all user credentials was provided."));
+    }
+
+    @Test
+    public void register_Failed_Lastname_Not_Provided() {
+        given()
+                .contentType(ContentType.JSON)
+                .body(String.format("{userName: \"%s\", "
+                        + "firstName: \"%s\", "
+                        + "lastName: \"%s\" , "
+                        + "password: \"%s\"}",
+                        user.getUserName(), user.getFirstName(), "", password))
+                .when().post("/auth/register")
+                .then()
+                .assertThat()
+                .body("code", is(HttpStatus.BAD_REQUEST_400.getStatusCode())).and()
+                .body("message", is("Not all user credentials was provided."));
+    }
+
+    @Test
+    public void register_Failed_Password_Not_Provided() {
+        given()
+                .contentType(ContentType.JSON)
+                .body(String.format("{userName: \"%s\", "
+                        + "firstName: \"%s\", "
+                        + "lastName: \"%s\" , "
+                        + "password: \"%s\"}",
+                        user.getUserName(), user.getFirstName(), user.getLastName(), ""))
+                .when().post("/auth/register")
+                .then()
+                .assertThat()
+                .body("code", is(HttpStatus.BAD_REQUEST_400.getStatusCode())).and()
+                .body("message", is("Not all user credentials was provided."));
     }
 
 }

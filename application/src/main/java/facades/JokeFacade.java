@@ -65,6 +65,17 @@ public class JokeFacade {
 
         return jokeDTOs;
     }
+    
+    public JokeDTO getJoke() throws FetchException{
+        String url = "https://api.yomomma.info";
+        String joke = "joke";
+        
+        JokeFetchHandler jfh = new JokeFetchHandler(url, joke);
+        
+        JokeDTO jokeDTO = convertToJokeDTO(jfh.call());
+        
+        return jokeDTO;
+    }
 
     private Map<String, String> getRequestsForJokes() {
         // <URL, jokeValue>
